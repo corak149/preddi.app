@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-primary: #0D9488;
+  --color-primary:       #0D9488;
   --color-primary-light: #14B8A6;
-  --color-primary-dark: #0F766E;
-  --color-background: #080B0B;
-  --color-surface: #0E1414;
+  --color-primary-dark:  #0F766E;
+  --color-background:    #080B0B;
+  --color-surface:       #0E1414;
   --color-surface-light: #162020;
-  --color-surface-card: #111A1A;
-  --color-foreground: #FFFFFF;
-  --color-muted: #94A3B8;
-  --font-sans: var(--font-inter);
+  --color-surface-card:  #111A1A;
+  --color-foreground:    #FFFFFF;
+  --color-muted:         #94A3B8;
+  --font-sans:           var(--font-inter);
 }
 
-* {
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -28,6 +28,7 @@ body {
   color: var(--color-foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
@@ -35,74 +36,28 @@ body {
   color: #FFFFFF;
 }
 
-/* ── Fade-up animation ─────────────────────────────── */
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(28px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.92);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
+/* ── Keyframes ─────────────────────────────────────── */
 @keyframes shimmer {
   0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  100% { background-position:  200% center; }
 }
 
 @keyframes glow-pulse {
-  0%, 100% { opacity: 0.55; }
-  50%       { opacity: 0.85; }
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 0.8; }
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-8px); }
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
-/* ── Utility classes ───────────────────────────────── */
-.animate-fade-up {
-  animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.6s ease both;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.animate-float {
-  animation: float 4s ease-in-out infinite;
-}
-
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
-.delay-300 { animation-delay: 0.3s; }
-.delay-400 { animation-delay: 0.4s; }
-.delay-500 { animation-delay: 0.5s; }
-.delay-600 { animation-delay: 0.6s; }
-
-/* ── Shimmer text ──────────────────────────────────── */
+/* ── Shimmer gradient text ─────────────────────────── */
 .text-shimmer {
   background: linear-gradient(
     90deg,
@@ -117,49 +72,32 @@ body {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: shimmer 4s linear infinite;
+  /* Ensure display:block so text-align:center works */
+  display: block;
 }
 
 /* ── Glow orbs ─────────────────────────────────────── */
 .glow-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  animation: glow-pulse 6s ease-in-out infinite;
+  filter: blur(90px);
   pointer-events: none;
-}
-
-/* ── Card border glow on hover ─────────────────────── */
-.card-glow {
-  position: relative;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card-glow::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  background: linear-gradient(135deg, rgba(13,148,136,0), rgba(13,148,136,0.35), rgba(13,148,136,0));
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  z-index: -1;
-}
-
-.card-glow:hover::before {
-  opacity: 1;
-}
-
-.card-glow:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(13, 148, 136, 0.12);
+  animation: glow-pulse 7s ease-in-out infinite;
 }
 
 /* ── Scroll reveal ─────────────────────────────────── */
+/*
+ * Key fix: use will-change so the browser reserves a compositing layer.
+ * The element is invisible but still occupies its natural space (no layout shift).
+ * We do NOT use display:inline on reveal wrappers — always block/flex.
+ */
 .reveal {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(22px);
+  transition:
+    opacity  0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
 }
 
 .reveal.visible {
@@ -167,12 +105,24 @@ body {
   transform: translateY(0);
 }
 
-/* ── Noise texture overlay ─────────────────────────── */
-.noise::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 1;
+/* Stagger delays */
+.reveal-delay-1 { transition-delay: 0.10s; }
+.reveal-delay-2 { transition-delay: 0.20s; }
+.reveal-delay-3 { transition-delay: 0.30s; }
+.reveal-delay-4 { transition-delay: 0.40s; }
+.reveal-delay-5 { transition-delay: 0.50s; }
+
+/* ── animate-scale-in ──────────────────────────────── */
+.animate-scale-in {
+  animation: scaleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Card hover glow ───────────────────────────────── */
+.card-glow {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card-glow:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 24px 48px rgba(13, 148, 136, 0.13);
 }
